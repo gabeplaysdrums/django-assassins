@@ -1,0 +1,14 @@
+<ol>
+  {% for key, value in subtree.items %}
+  {% if key %}
+  <li>
+    {{ key }}
+    {% include 'gamerules_details_kill_actions.html' with subtree=value %}
+  </li>
+  {% else %}
+  {% for condition in value %}
+  <li>{{ condition }}</li>
+  {% endfor %}
+  {% endif %}
+  {% endfor %}
+</ol>

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}{{ rules.name }} Game Rules{% endblock %}
+{% block head %}
+<style type="text/css">
+  ol { counter-reset: item }
+  li { display: block }
+  li:before { content: counters(item, ".") ". "; counter-increment: item }
+
+  ol#rules > li {
+    font-weight: bold;
+  }
+
+  ol#rules > li > ol {
+    font-weight: normal;
+  }
+</style>
+{% endblock %}
+{% block content %}
+
+<h1>{{ rules.name }} Game Rules</h1>
+
+<ol id="rules">
+  <li>
+    Game Setup
+    <ol>
+      <li>
+        The game requires
+        {% if not max_total_players %}
+          {{ min_total_players }} or more
+        {% else %}
+          {{ min_total_players }} to {{ max_total_players }}
+        {% endif %}
+        players
+      </li>
+      {% if rules.factions.count > 1 %}
+      <li>
+        Each player starts in one of {{ rules.factions.count }} factions (chosen at random):
+        <ol>
+          {% for faction in rules.factions.all %}
+          <li>{{ faction.name }}
+            {% if faction.max_starting_players == 0 %}
+              ({{ faction.min_starting_players }}+ players)
+            {% elif faction.min_starting_players == faction.max_starting_players and faction.min_starting_players == 1 %}
+              ({{ faction.min_starting_players }} player)
+            {% elif faction.min_starting_players == faction.max_starting_players %}
+              ({{ faction.min_starting_players }} players)
+            {% else %}
+              ({{ faction.min_starting_players }} to {{ faction.max_starting_players }} players)
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </li>
+      {% endif %}
+      {% if rules.max_assigned_targets > 0 %}
+      <li>
+        Each player is assigned
+        {% if rules.max_assigned_targets == 1 %}
+        a target
+        {% else %}
+        up to {{ rules.max_assigned_targets }} targets
+        {% endif %}
+        (at random) and is given their
+        {% if rules.max_assigned_targets == 1 %}
+        real name and email address
+        {% else %}
+        real name(s) and email address(es)
+        {% endif %}
+      </li>
+      {% if rules.factions.count > 1 %}
+      {% if rules.assign_targets_in_own_faction %}
+        Players can be assigned targets in any faction (including their own).
+      {% else %}
+        Players are only assigned targed in opposing factions.
+      {% endif %}
+      {% endif %}
+      {% endif %}
+      <li>Each player has a score that is initially zero (0)</li>
+      <li>Each player is given <a href="#life-token">Life Token</a> that is active immediately</li>
+    </ol>
+  </li>
+  <li>
+    <a name="life-token">Life Tokens</a>
+    <ol>
+      <li>At the start of the game, each player is given a unique randomly generated string called a Life Token</li>
+      <li>Players should keep their Life Token secret except in very specific circumstances (guard it with your life!)</li>
+      <li>A player is "alive" if they have an active Life Token.  Otherwise, they are "dead" and cannot kill or be killed.</li>
+      <li>Life Tokens have a start date and (sometimes) an end date.  A Life Token is only active if its start date
+        is in the past and its end date is in the future.</li>
+      <li>A Life Token can also become inactive if the player is <a href="#kills">killed</a> by another player.</li>
+    </ol>
+  </li>
+  <li>
+    <a name="kills">Killing Other Players</a>
+    <ol>
+      <li>When one player successfully kills another (using legal weapons, not in a safe zone, etc.), the victim must
+        surrender his or her life token to their killer.</li>
+      <li>If the victim does not believe they were killed in a legal manner, they should consult the Umpire and only
+        surrender their <a href="#life-token">Life Token</a> if the Umpire deems it a legal kill.</li>
+      <li>The killer must confirm the kill by reporting it and giving the victim's Life Token.</li>
+      <li>
+        Once the kill is confirmed, the following actions will happen immediately:
+        {% include 'gamerules_details_kill_actions.html' with subtree=kill_actions_tree %}
+      </li>
+    </ol>
+  </li>
+  <li>
+    Ending the Game
+    <ol>
+      <li>
+        {% if rules.expiry_days > 0 %}
+        The game ends after {{ rules.expiry_days }} or
+        {% else %}
+        The game ends when
+        {% endif %}
+        <a href="#kills">a winner is declared</a>.
+      </li>
+    </ol>
+  </li>
+</ol>
+
+{% endblock %}

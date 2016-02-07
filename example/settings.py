@@ -26,6 +26,10 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+TEMPLATE_DIRS = (
+    os.path.join(os.path.join(BASE_DIR, 'example'), 'templates'),
+)
+
 
 # Application definition
 
@@ -36,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'assassins',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -52,6 +57,9 @@ ROOT_URLCONF = 'example.urls'
 
 WSGI_APPLICATION = 'example.wsgi.application'
 
+AUTH_USER_MODEL = 'assassins.User'
+
+ENCRYPTED_FIELDS_KEYDIR = os.path.join(BASE_DIR, 'fieldkeys')
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
